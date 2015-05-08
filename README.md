@@ -31,11 +31,13 @@ sudo echo udacity.vzool.me > /etc/hostname
 
 When you want to change your default SSH Server port from 22 to any other one you need to edit and change its config file which located at `/etc/ssh/sshd_config` and remember it's `sshd_config` not `ssh_config`.
 
+Even we need to secure our server by not allow root to be login in remotely.
+
 ```shell
 sudo nano /etc/ssh/sshd_config
 ```
 
-Then change Port:
+Then change Port and some new options:
 
 ```
 # Package generated configuration file
@@ -43,6 +45,11 @@ Then change Port:
 
 # What ports, IPs and protocols we listen for
 Port 2200
+DenyUsers root
+AllowUsers grader
+
+# Change value to no
+PermitRootLogin no
 ```
 
 Save the file and restart SSH Server:
@@ -76,7 +83,7 @@ Some commands needs to execute:
 
 ```sell
 # Add a new user
-sudo useradd -m grader
+sudo adduser grader
 ```
 
 Then add sudo permission to grader, and that's done by this:
@@ -86,12 +93,24 @@ Then add sudo permission to grader, and that's done by this:
 sudo echo "grader  ALL=(ALL:ALL) ALL" >> /etc/sudoers
 ```
 
-Finall, you will need to set a password for grader by:
+After that login as grader
 
 ```shell
-sudo passwd grader
+su grader
 ```
 
+Create SSH Key without password
+
+```shell
+ssh-keygen -t rsa
+```
+Make new SSH key on of the `authorized_keys`
+
+```shell
+cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys
+```
+
+Now you can login remotely without passwords, just by a private key which located at `~/.ssh/id_rsa`
 
 ## Task #3 Install PostgreSQL, create database(grader) for user(grader)
 
@@ -146,11 +165,18 @@ Remember, always looking for the latest versions at `https://code.google.com/p/m
 
 ```shell
 wget https://github.com/GrahamDumpleton/mod_wsgi/archive/3.5.tar.gz
-tar xvfz 3.5.11.tar.gz
+tar xvfz 3.5.tar.gz
 ```
 
 ### Build mod_wsgi and install it
 
+Before you build you need some packages
+
+```shell
+sudo apt-get install gcc apache2-dev python-dev
+```
+
+Then you can build and install after that 
 ```shell
 cd mod_wsgi-3.5
 ./configure
@@ -205,16 +231,13 @@ sudo pip install httplib2
 sudo pip install oauth2client
 
 # install flask
-sudo pip install oauth2client
+sudo pip install flask
 
 # install sqlalchemy
 sudo pip install sqlalchemy
 
 # install psycopg2
 sudo pip install psycopg2
-
-# install requests
-sudo pip install requests
 ```
 
 ### Configure Database
@@ -316,7 +339,7 @@ sudo service apache2 restart
 
 Open your favorite browser with one of these links:
 
-- [http://52.24.14.78/][8]
+- [http://52.24.160.63/][8]
 - [http://udacity.vzool.me/][9]
 
 # Licence
@@ -332,5 +355,5 @@ This licence is known with [MIT License][1] in professional networks.
 [5]: https://www.linux.com/
 [6]: https://www.python.org/
 [7]: https://github.com
-[8]: http://52.24.14.78/
+[8]: http://52.24.160.63/
 [9]: http://udacity.vzool.me/
